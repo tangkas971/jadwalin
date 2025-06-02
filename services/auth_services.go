@@ -76,8 +76,8 @@ func (s *authService) CreateStudent(userRole string, input dto.StudentRegisterRe
 	Student := model.Student{
 		UserID: User.Id,
 		Nim: input.NIM,
-		Grade: input.Grade,
-		Prodi: input.Prodi,
+		GradeId: input.GradeId,
+		ProdiId: input.ProdiId,
 	}
 
 	err = s.authRepo.CreateStudent(&Student)
