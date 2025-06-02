@@ -3,7 +3,11 @@ package model
 type Student struct {
 	UserID int
 	Nim    int
-	Grade  string
-	Prodi  string
+
+	GradeId int
+	Grade  Grade
+
+	ProdiId int
+	Prodi  Prodi
 	User   User
 }

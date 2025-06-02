@@ -36,3 +36,4 @@ func (r *authRepository) CreateUser(user *model.User) error {
 	err := r.db.Save(user).Error
 	return err
 }
+

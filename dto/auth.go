@@ -15,8 +15,8 @@ type StudentRegisterRequest struct {
 	Password        string `json:"password" binding:"required,min=6"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 	Role            string `json:"role" binding:"required,oneof=mahasiswa dosen admin"`
-	Grade           string `json:"grade" binding:"required"`
-	Prodi           string `json:"prodi" binding:"required"`
+	GradeId         string `json:"grade_id" binding:"required"`
+	ProdiId         string `json:"prodi_id" binding:"required"`
 }
 
 type LecturerRegisterRequest struct {

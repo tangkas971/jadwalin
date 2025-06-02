@@ -5,6 +5,7 @@ import (
 	"jadwalin/dto"
 	"jadwalin/model"
 	"jadwalin/repository"
+	"jadwalin/utils"
 
 	"gorm.io/gorm"
 )
@@ -28,14 +29,17 @@ func NewSubjectServices(repo repository.SubjectRepository) SubjectServices{
 }
 
 func (s *subjectServices) Create(roleUser string, input dto.CreateSubjectRequest)(dto.SubjectResponseDTO, error){
-	if roleUser != "admin" {
+	// cek apakah user yang membuat subject adalah admin
+	err := utils.RoleCheck(roleUser, "admin")
+	if err != nil {
 		return dto.SubjectResponseDTO{}, fmt.Errorf("hanya admin yang dapat menambahkan subject baru")
 	}
+
 	subject := model.Subject{
 		Code: input.Code,
 		Name: input.Name,
 	}
-	err := s.repo.Create(&subject)
+	err = s.repo.Create(&subject)
 	if err != nil {
 		return dto.SubjectResponseDTO{}, err
 	}
