@@ -134,7 +134,7 @@ func (s *authService) CreateLecturer(userRole string, input dto.LecturerRegister
 	Lecturer := model.Lecturer{
 		UserID: User.Id,
 		Nip: input.NIP,
-		Prodi: input.Prodi,
+		ProdiId: input.ProdiId,
 	}
 
 	err = s.authRepo.CreateLecturer(&Lecturer)

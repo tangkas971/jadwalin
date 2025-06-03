@@ -8,17 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ProdiController struct {
-	prodiService services.ProdiService
+type GradeController struct {
+	gradeService services.GradeService
 }
 
-func NewProdiController(prodiService services.ProdiService) *ProdiController{
-	return &ProdiController{
-		prodiService: prodiService,
+func NewGradeController(gradeService services.GradeService) *GradeController{
+	return &GradeController{
+		gradeService:gradeService ,
 	}
 }
 
-func (c *ProdiController) Create(ctx *gin.Context){
+func (c *GradeController) Create(ctx *gin.Context){
 	roleAny, exists := ctx.Get("userRole")
 	if !exists {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -27,9 +27,9 @@ func (c *ProdiController) Create(ctx *gin.Context){
 		return 
 	}
 	userRole := roleAny.(string)
-	var prodiDTO dto.ProdiRequestDTO
+	var gradeDTO dto.GradeRequestDTO
 
-	err := ctx.ShouldBindJSON(&prodiDTO)
+	err := ctx.ShouldBindJSON(&gradeDTO)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error" : err.Error(),
@@ -37,15 +37,15 @@ func (c *ProdiController) Create(ctx *gin.Context){
 		return 
 	}
 
-	err = c.prodiService.Create(userRole, prodiDTO)
+	err = c.gradeService.Create(userRole, gradeDTO)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error" : err.Error(), 
+			"error" : err.Error(),
 		})
 		return 
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
-		"message" : "prodi succesfully created",
+		"message" : "grade berhasil dibuat",
 	})
 }

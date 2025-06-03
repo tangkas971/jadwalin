@@ -21,6 +21,7 @@ func main() {
 	studentTaskRepo := repository.NewStudentTaskRepository(config.DB)
 	authRepo := repository.NewAuthRepository(config.DB)
 	prodiRepo := repository.NewProdiRepository(config.DB)
+	gradeRepo := repository.NewGradeRepository(config.DB)
 
 	userService := services.NewUserService(userRepo)
 	scheduleService := services.NewScheduleService(scheduleRepo)
@@ -30,6 +31,7 @@ func main() {
 	taskService := services.NewTaskService(taskRepo, userService, studentTaskService)
 	authService := services.NewAuthService(authRepo, userRepo)
 	prodiService := services.NewProdiService(prodiRepo)
+	gradeService := services.NewGradeService(gradeRepo)
 	
 	authController := controller.NewAuthController(authService, blacklistTokenService)
 	scheduleController := controller.NewScheduleController(scheduleService)
@@ -38,6 +40,7 @@ func main() {
 	taskController := controller.NewTaskController(taskService)
 	studentTaskController := controller.NewStudentTaskController(studentTaskService)
 	prodiController := controller.NewProdiController(prodiService)
+	gradeController := controller.NewGradeController(gradeService)
 
 
 	router := gin.Default()
@@ -49,6 +52,7 @@ func main() {
 	routes.TaskRoutes(router, taskController, blacklistTokenService)
 	routes.StudentTask(router, studentTaskController, blacklistTokenService)
 	routes.ProdiRoute(router, prodiController, blacklistTokenService)
+	routes.GradeRoute(router, gradeController, blacklistTokenService)
 	
 
 	router.Run()

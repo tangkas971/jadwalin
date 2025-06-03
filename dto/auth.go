@@ -26,7 +26,7 @@ type LecturerRegisterRequest struct {
 	Password        string `json:"password" binding:"required,min=6"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 	Role            string `json:"role" binding:"required,oneof=mahasiswa dosen admin"`
-	Prodi           string `json:"prodi" binding:"required"`
+	ProdiId	        int	   `json:"prodi_id" binding:"required"`
 }
 
 type LoginUserRequest struct {

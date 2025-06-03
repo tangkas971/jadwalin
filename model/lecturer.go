@@ -3,6 +3,7 @@ package model
 type Lecturer struct {
 	UserID int
 	Nip    int
-	Prodi  string
+	ProdiId  int
+	Prodi Prodi
 	User   User
 }

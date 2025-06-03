@@ -8,10 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ProdiRoute(router *gin.Engine, prodiController *controller.ProdiController, blacklistService services.BlacklistTokenService){
+func GradeRoute(router *gin.Engine, gradeController *controller.GradeController, blacklistService services.BlacklistTokenService){
 	v1 := router.Group("v1")
 	auth := v1.Group("/", middlewares.AuthMiddleware(blacklistService))
 
-	auth.POST("/prodi", prodiController.Create)
-
+	auth.POST("/grade", gradeController.Create)
 }

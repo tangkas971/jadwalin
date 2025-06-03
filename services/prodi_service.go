@@ -4,10 +4,11 @@ import (
 	"jadwalin/dto"
 	"jadwalin/model"
 	"jadwalin/repository"
+	"jadwalin/utils"
 )
 
 type ProdiService interface {
-	Create(input dto.ProdiRequestDTO) error
+	Create(userRole string, input dto.ProdiRequestDTO) error
 }
 
 type prodiService struct {
@@ -20,12 +21,17 @@ func NewProdiService(prodiRepo repository.ProdiRepository) ProdiService {
 	}
 }
 
-func (s *prodiService) Create(input dto.ProdiRequestDTO) error {
+func (s *prodiService) Create(userRole string, input dto.ProdiRequestDTO) error {
+	err := utils.RoleCheck(userRole, "admin")
+	if err != nil {
+		return err
+	}
+	
 	prodi := model.Prodi{
 		Code: input.Code,
 		Name: input.Name,
 	}
-	err := s.prodiRepo.CreateProdi(&prodi)
+	err = s.prodiRepo.CreateProdi(&prodi)
 	if err != nil {
 		return err
 	}
