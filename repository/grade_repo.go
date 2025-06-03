@@ -8,6 +8,7 @@ import (
 
 type GradeRepository interface {
 	CreateGrade(grade *model.Grade) error
+	FindByCode(code string)(*model.Grade, error)
 }
 
 type gradeRepository struct {
@@ -23,4 +24,13 @@ func NewGradeRepository(db *gorm.DB) GradeRepository {
 func (r *gradeRepository) CreateGrade(grade *model.Grade) error {
 	err := r.db.Create(grade).Error
 	return err
+}
+
+func (r *gradeRepository) FindByCode(code string)(*model.Grade, error){
+	var grade model.Grade
+	err := r.db.Where("code = ?", code).First(&grade).Error
+	if err != nil {
+		return nil, err
+	}
+	return &grade, nil 
 }

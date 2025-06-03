@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"jadwalin/dto"
 	"jadwalin/model"
 	"jadwalin/repository"
@@ -22,10 +23,22 @@ func NewGradeService(gradeRepo repository.GradeRepository) GradeService {
 }
 
 func (s *gradeService) Create(userRole string, input dto.GradeRequestDTO) error{
+	// Cek apakah user role adalah admin
 	err := utils.RoleCheck(userRole, "admin")
 	if err != nil {
 		return err
 	}
+
+	// cek apakah kode grade sudah terdaftar atau belum
+	existingGrade, err := s.gradeRepo.FindByCode(input.Code) 
+	if err != nil {
+		return err
+	}
+
+	if existingGrade != nil {
+		return fmt.Errorf("code grade yang anda masukkan sudah terdaftar")
+	}
+
 	grade := model.Grade{
 		Code: input.Code,
 		Name: input.Name,
