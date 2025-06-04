@@ -11,4 +11,5 @@ type GradeResponseDTO struct {
 	Code    string `json:"code" binding:"required"`
 	Name    string `json:"name" binding:"required"`
 	ProdiId int    `json:"prodi_id" binding:"required"`
+	Prodi   ProdiResponseDTO
 }
