@@ -20,7 +20,9 @@ func NewTaskController(taskService services.TaskService) *TaskController{
 
 func (c *TaskController) Create(ctx *gin.Context){
 	idAny, _ := ctx.Get("userId")
+	roleAny, _ := ctx.Get("userRole")
 	userId := idAny.(uint)
+	userRole := roleAny.(string)
 	var taskDTO dto.TaskRequestDTO
 	err := ctx.ShouldBindJSON(&taskDTO)
 	if err != nil {
@@ -32,7 +34,7 @@ func (c *TaskController) Create(ctx *gin.Context){
 
 	taskDTO.LecturerId = int(userId)
 
-	err = c.taskService.Create(taskDTO)
+	err = c.taskService.Create(userRole, taskDTO)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error" : err.Error(),

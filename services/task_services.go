@@ -1,13 +1,15 @@
 package services
 
 import (
+	"fmt"
 	"jadwalin/dto"
 	"jadwalin/model"
 	"jadwalin/repository"
+	"jadwalin/utils"
 )
 
 type TaskService interface {
-	Create(input dto.TaskRequestDTO) error
+	Create(userRole string, input dto.TaskRequestDTO) error
 }
 
 type taskService struct {
@@ -24,8 +26,13 @@ func NewTaskService(taskRepo repository.TaskRepository, userService UserService,
 	}
 }
 
+func (s *taskService) Create(userRole string, input dto.TaskRequestDTO)error{
+	// cek role user
+	err := utils.RoleCheck(userRole, "dosen")
+	if err != nil {
+		return fmt.Errorf("anda adalah seorang %s. hanya dosen yang dapat membuat tugas", userRole)
+	}
 
-func (s *taskService) Create(input dto.TaskRequestDTO)error{
 	task := model.Task{
 		Title: input.Title,
 		Description: input.Description,
@@ -34,7 +41,7 @@ func (s *taskService) Create(input dto.TaskRequestDTO)error{
 		LecturerId: input.LecturerId,
 	}
 
-	err := s.taskRepo.Create(&task)
+	err = s.taskRepo.Create(&task)
 	if err != nil{
 		return err
 	}
