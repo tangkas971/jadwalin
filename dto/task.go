@@ -21,4 +21,7 @@ type TaskResponseDTO struct{
 
 	LecturerId int `json:"lecturer_id"`
 	Lecturer LecturerResponseDTO
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

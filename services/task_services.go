@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"jadwalin/dto"
 	"jadwalin/model"
 	"jadwalin/repository"
@@ -10,6 +9,9 @@ import (
 
 type TaskService interface {
 	Create(userRole string, input dto.TaskRequestDTO) error
+	GetAll()([]dto.TaskResponseDTO, error)
+	Delete(id int) error
+	Update(id int, input dto.TaskRequestDTO) error
 }
 
 type taskService struct {
@@ -30,7 +32,7 @@ func (s *taskService) Create(userRole string, input dto.TaskRequestDTO)error{
 	// cek role user
 	err := utils.RoleCheck(userRole, "dosen")
 	if err != nil {
-		return fmt.Errorf("anda adalah seorang %s. hanya dosen yang dapat membuat tugas", userRole)
+		return err
 	}
 
 	task := model.Task{
@@ -67,3 +69,61 @@ func (s *taskService) Create(userRole string, input dto.TaskRequestDTO)error{
 	return nil 
 }
 
+func (s *taskService) GetAll()([]dto.TaskResponseDTO, error){
+	tasks, err := s.taskRepo.GetAll()
+	if err != nil {
+		return []dto.TaskResponseDTO{}, err
+	}
+
+	var taskDTOs []dto.TaskResponseDTO
+
+	for _, task := range tasks{
+		taskDTO := dto.TaskResponseDTO{
+			Id: task.Id,
+			Title: task.Title,
+			Description: task.Description,
+			Deadline: task.Deadline,
+			Subject: dto.SubjectResponseDTO{
+				Id: task.Subject.Id,
+				Name: task.Subject.Name,
+			},
+			Lecturer: dto.LecturerResponseDTO{
+				Id: task.Lecturer.Id,
+				Name: task.Lecturer.Name,
+			},
+			CreatedAt: task.CreatedAt,
+			UpdatedAt: task.UpdatedAt,
+		}
+		taskDTOs = append(taskDTOs, taskDTO)
+	}
+
+	return taskDTOs, nil 
+}
+
+func (s *taskService) Delete(id int) error{
+	err := s.taskRepo.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil 
+}
+
+func (s *taskService) Update(id int, input dto.TaskRequestDTO) error{
+	existingTask, err := s.taskRepo.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	existingTask.Title = input.Title
+	existingTask.Description = input.Description
+	existingTask.Deadline = input.Deadline
+	existingTask.SubjectId = input.SubjectId
+
+	err = s.taskRepo.Update(existingTask)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

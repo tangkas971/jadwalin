@@ -46,3 +46,56 @@ func (c *TaskController) Create(ctx *gin.Context){
 		"message" : "task successfully created",
 	})
 }
+
+func (c *TaskController) GetAll(ctx *gin.Context){
+	taskDTOs, err := c.taskService.GetAll()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusOK, taskDTOs)
+}
+
+func (c *TaskController) Delete(ctx *gin.Context){
+	id, _ := utils.GetIdParam(ctx)
+
+	err := c.taskService.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message" : "task successfully deleted",
+	})
+}
+
+func (c *TaskController) Update(ctx *gin.Context){
+	id, _ := utils.GetIdParam(ctx)
+	var taskDTO dto.TaskRequestDTO
+
+	err := ctx.ShouldBindJSON(&taskDTO)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error" : err.Error(),
+		})
+		return
+	}
+
+	err = c.taskService.Update(id, taskDTO)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"messages" : "task successfully updated",
+	})
+}

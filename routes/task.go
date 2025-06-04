@@ -13,4 +13,7 @@ func TaskRoutes(router *gin.Engine, taskController *controller.TaskController, b
 	auth := v1.Group("/", middlewares.AuthMiddleware(blacklistService))
 
 	auth.POST("/tasks", taskController.Create)
+	auth.GET("/tasks", taskController.GetAll)
+	auth.DELETE("/tasks/:id", taskController.Delete)
+	auth.PUT("/tasks/:id", taskController.Update)
 }

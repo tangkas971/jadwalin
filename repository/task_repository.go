@@ -7,7 +7,7 @@ import (
 )
 
 type TaskRepository interface {
-	FindAll()([]*model.Task, error)
+	GetAll()([]*model.Task, error)
 	FindById(id int)(*model.Task, error)
 	Create(task *model.Task) error
 	Update(task *model.Task) error
@@ -24,9 +24,9 @@ func NewTaskRepository(db *gorm.DB) TaskRepository {
 	}
 }
 
-func (r *taskRepository) FindAll()([]*model.Task, error){
+func (r *taskRepository) GetAll()([]*model.Task, error){
 	var tasks []*model.Task
-	err := r.db.Find(&tasks).Error
+	err := r.db.Preload("Subject").Preload("Lecturer").Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
@@ -36,8 +36,11 @@ func (r *taskRepository) FindAll()([]*model.Task, error){
 
 func (r *taskRepository) FindById(id int)(*model.Task, error){
 	var task *model.Task
-	err := r.db.First(&task, id).Error
+	err := r.db.Where("id = ?", id).First(&task).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound{
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -45,7 +48,7 @@ func (r *taskRepository) FindById(id int)(*model.Task, error){
 }
 
 func (r *taskRepository) Create(task *model.Task) error {
-	err := r.db.Save(task).Error
+	err := r.db.Create(task).Error
 	return err
 }
 
