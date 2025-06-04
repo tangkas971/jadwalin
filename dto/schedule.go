@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type ScheduleRequestDTO struct {
 	UserId     int    `json:"user_id"`
 	Day        string `json:"day" binding:"required"`
@@ -30,4 +32,6 @@ type ScheduleResponseDTO struct {
 	Grade      GradeResponseDTO
 	LecturerId int                 `json:"lecturer_id"`
 	Lecturer   LecturerResponseDTO `json:"lecturer"`
+	CreatedAt  time.Time 		   `json:"created_at"`
+	UpdateAt   time.Time 		   `json:"updated_at"`
 }

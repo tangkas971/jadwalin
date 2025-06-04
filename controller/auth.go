@@ -23,14 +23,7 @@ func NewAuthController(authService services.AuthService, blackListTokenService s
 }
 
 func (c *AuthController) RegisterStudent(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "unauthorized",
-		})
-		return
-	}
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
 
 	var userDTO dto.StudentRegisterRequest
 
@@ -56,14 +49,7 @@ func (c *AuthController) RegisterStudent(ctx *gin.Context){
 }
 
 func (c *AuthController) RegisterLecturer(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "unauthorized",
-		})
-		return
-	}
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
 
 	var userDTO dto.LecturerRegisterRequest
 
@@ -89,14 +75,8 @@ func (c *AuthController) RegisterLecturer(ctx *gin.Context){
 }
 
 func (c *AuthController) RegisterAdmin(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "unauthorized",
-		})
-		return
-	}
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
+	
 	var userDTO dto.AdminRegisterRequest
 	err := ctx.ShouldBindJSON(&userDTO)
 	if err != nil {

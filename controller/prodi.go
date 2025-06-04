@@ -3,8 +3,8 @@ package controller
 import (
 	"jadwalin/dto"
 	"jadwalin/services"
+	"jadwalin/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,14 +20,8 @@ func NewProdiController(prodiService services.ProdiService) *ProdiController{
 }
 
 func (c *ProdiController) Create(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "unauthorized",
-		})
-		return 
-	}
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
+	
 	var prodiDTO dto.ProdiRequestDTO
 
 	err := ctx.ShouldBindJSON(&prodiDTO)
@@ -64,10 +58,8 @@ func (c *ProdiController) GetAll(ctx *gin.Context){
 }
 
 func (c *ProdiController) Update(ctx *gin.Context){
-	roleAny, _ := ctx.Get("userRole")
-	userRole := roleAny.(string)
-	idParam := ctx.Param("id")
-	id, _ := strconv.Atoi(idParam)
+	userRole := utils.GetUserRole(ctx)
+	id, _ := utils.GetIdParam(ctx)
 
 	var prodiDTO dto.ProdiRequestDTO
 	err := ctx.ShouldBindJSON(&prodiDTO)
@@ -92,10 +84,8 @@ func (c *ProdiController) Update(ctx *gin.Context){
 }
 
 func (c *ProdiController) Delete(ctx *gin.Context){
-	roleAny, _ := ctx.Get("userRole")
-	userRole := roleAny.(string)
-	idParam := ctx.Param("id")
-	id, _ := strconv.Atoi(idParam)
+	userRole := utils.GetUserRole(ctx)
+	id, _ := utils.GetIdParam(ctx)
 
 	err := c.prodiService.Delete(userRole, id)
 	if err != nil {

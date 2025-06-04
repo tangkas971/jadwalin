@@ -3,7 +3,7 @@ package controller
 import (
 	"jadwalin/dto"
 	"jadwalin/services"
-	"log"
+	"jadwalin/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,16 +20,10 @@ func NewScheduleController(service services.ScheduleService) *ScheduleController
 }
 
 func (c *ScheduleController) Create(ctx *gin.Context){
-	roleAny, _ := ctx.Get("userRole")
-	idAny,_ := ctx.Get("userId")
-	prodiAny,_ := ctx.Get("userProdi")
-	log.Println("ini prodiId ctrl", prodiAny)
-	log.Println("ini user Role", roleAny)
-
-	userRole := roleAny.(string)
-	userId := idAny.(uint)
-	userProdi := prodiAny.(uint)
-	log.Println("ini user prodi uint", userProdi)
+	// utils
+	userRole := utils.GetUserRole(ctx)
+	userId := utils.GetUserId(ctx)
+	userProdi := utils.GetUserProdi(ctx)
 
 	var scheduleDTO dto.ScheduleRequestDTO
 
@@ -42,9 +36,9 @@ func (c *ScheduleController) Create(ctx *gin.Context){
 		return 
 	}
 
-	scheduleDTO.UserId = int(userId)
+	scheduleDTO.UserId = userId
 	scheduleDTO.UserRole = userRole
-	scheduleDTO.ProdiId = int(userProdi)
+	scheduleDTO.ProdiId = userProdi
 	
 	err = c.service.Create(scheduleDTO)
 	if err != nil {
@@ -58,4 +52,57 @@ func (c *ScheduleController) Create(ctx *gin.Context){
 		"message" : "schedules successfully created",
 	})
 
+}
+
+func (c *ScheduleController) GetAll(ctx *gin.Context){
+	scheduleDTOs, err := c.service.GetAll()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusOK, scheduleDTOs)
+}
+
+func (c *ScheduleController) Delete(ctx *gin.Context){
+	id, _ := utils.GetIdParam(ctx)
+
+	err := c.service.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message" : "berhasil menghapus schedule", 
+	})
+}
+
+func (c *ScheduleController) Update(ctx *gin.Context){
+	id, _ := utils.GetIdParam(ctx)
+	
+	var schedule dto.ScheduleRequestDTO
+	err := ctx.ShouldBindJSON(&schedule)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error" : err.Error(), 
+		})
+		return 
+	}
+
+	err = c.service.Update(id, schedule)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message" : "schedule successfully updated",
+	})
 }

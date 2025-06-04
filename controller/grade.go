@@ -3,8 +3,8 @@ package controller
 import (
 	"jadwalin/dto"
 	"jadwalin/services"
+	"jadwalin/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,14 +20,8 @@ func NewGradeController(gradeService services.GradeService) *GradeController{
 }
 
 func (c *GradeController) Create(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "unauthorized",
-		})
-		return 
-	}
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
+	
 	var gradeDTO dto.GradeRequestDTO
 
 	err := ctx.ShouldBindJSON(&gradeDTO)
@@ -64,10 +58,8 @@ func (c *GradeController) GetAll(ctx *gin.Context){
 }
 
 func (c *GradeController) Delete(ctx *gin.Context){
-	roleAny, _ := ctx.Get("userRole")
-	userRole := roleAny.(string)
-	idParam := ctx.Param("id")
-	id, _ := strconv.Atoi(idParam)
+	userRole := utils.GetUserRole(ctx)
+	id,_ := utils.GetIdParam(ctx)
 
 	err := c.gradeService.Delete(userRole, id)
 	if err != nil{
@@ -83,10 +75,8 @@ func (c *GradeController) Delete(ctx *gin.Context){
 }
 
 func (c *GradeController) Update(ctx *gin.Context){
-	roleAny, _ := ctx.Get("userRole")
-	userRole := roleAny.(string)
-	idParam := ctx.Param("id")
-	id, _ := strconv.Atoi(idParam)
+	userRole := utils.GetUserRole(ctx)
+	id, _ := utils.GetIdParam(ctx)
 
 	var gradeDTO dto.GradeRequestDTO
 	err := ctx.ShouldBindJSON(&gradeDTO)

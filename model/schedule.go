@@ -9,10 +9,10 @@ type Schedule struct {
     EndTime    string
 
     SubjectId  int
-	Subject    Subject `gorm:"foreignKey:SubjectId;references:Id"`
+	Subject    Subject 
 
     LecturerId int
-    Lecturer   User `gorm:"foreignKey:LecturerId;references:Id"`
+    Lecturer   User 
 
     GradeId int
     Grade Grade

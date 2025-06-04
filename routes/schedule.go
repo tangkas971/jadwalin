@@ -13,4 +13,7 @@ func ScheduleRoutes(router *gin.Engine, scheduleController *controller.ScheduleC
 	auth := v1.Group("/", middlewares.AuthMiddleware(blacklistService))
 
 	auth.POST("/schedules", scheduleController.Create)
+	auth.GET("/schedules", scheduleController.GetAll)
+	auth.PUT("/schedules/:id", scheduleController.Update)
+	auth.DELETE("/schedules/:id", scheduleController.Delete)
 }

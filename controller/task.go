@@ -3,6 +3,7 @@ package controller
 import (
 	"jadwalin/dto"
 	"jadwalin/services"
+	"jadwalin/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,10 +20,9 @@ func NewTaskController(taskService services.TaskService) *TaskController{
 }
 
 func (c *TaskController) Create(ctx *gin.Context){
-	idAny, _ := ctx.Get("userId")
-	roleAny, _ := ctx.Get("userRole")
-	userId := idAny.(uint)
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
+	userId := utils.GetUserId(ctx)
+	
 	var taskDTO dto.TaskRequestDTO
 	err := ctx.ShouldBindJSON(&taskDTO)
 	if err != nil {

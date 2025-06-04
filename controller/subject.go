@@ -3,6 +3,7 @@ package controller
 import (
 	"jadwalin/dto"
 	"jadwalin/services"
+	"jadwalin/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,14 +20,7 @@ func NewSubjectController(subjectService services.SubjectService) *SubjectContro
 }
 
 func (c *SubjectController) Create(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "unauthorized",
-		})
-		return 
-	}
-	userRole := roleAny.(string)
+	userRole := utils.GetUserRole(ctx)
 
 	var subjectDTO dto.SubjectRequestDTO
 

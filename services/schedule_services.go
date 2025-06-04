@@ -6,10 +6,15 @@ import (
 	"jadwalin/model"
 	"jadwalin/repository"
 	"jadwalin/utils"
+
+	"gorm.io/gorm"
 )
 
 type ScheduleService interface {
 	Create(input dto.ScheduleRequestDTO) error
+	GetAll()([]dto.ScheduleResponseDTO, error)
+	Delete(id int) error
+	Update(id int, input dto.ScheduleRequestDTO) error
 }
 
 type scheduleService struct {
@@ -68,4 +73,75 @@ func (s *scheduleService) Create(input dto.ScheduleRequestDTO) error {
 
 	return nil 
 	
+}
+
+func (s *scheduleService) GetAll()([]dto.ScheduleResponseDTO, error){
+	schedules, err := s.repo.GetAll()
+	if err != nil {
+		return []dto.ScheduleResponseDTO{}, err
+	}
+
+	var scheduleDTOs []dto.ScheduleResponseDTO
+
+	for _, schedule := range schedules{
+		scheduleDTO := dto.ScheduleResponseDTO{
+			Id: schedule.Id,
+			Day: schedule.Day,
+			StartTime: schedule.StartTime,
+			EndTime: schedule.EndTime,
+			Subject: dto.SubjectResponseDTO{
+				Id: schedule.Subject.Id,
+				Name: schedule.Subject.Name,
+			},
+			Lecturer: dto.LecturerResponseDTO{
+				Id: schedule.Lecturer.Id,
+				Name: schedule.Lecturer.Name,
+			},
+			Grade: dto.GradeResponseDTO{
+				Id: schedule.Grade.Id,
+				Name: schedule.Grade.Name,
+			},
+			Prodi: dto.ProdiResponseDTO{
+				Id: schedule.Prodi.Id,
+				Name: schedule.Prodi.Name,
+			},
+			CreatedAt: schedule.CreatedAt,
+			UpdateAt: schedule.UpdatedAt,
+		}
+		scheduleDTOs = append(scheduleDTOs, scheduleDTO)
+	}
+
+	return scheduleDTOs, nil 
+}
+
+func (s *scheduleService) Delete(id int) error{
+	err := s.repo.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil 
+}
+
+func (s *scheduleService) Update(id int, input dto.ScheduleRequestDTO) error{
+	existingSchedule, err := s.repo.FindById(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound{
+			return nil
+		}
+		return err
+	}
+
+	existingSchedule.Day = input.Day
+	existingSchedule.StartTime = input.StartTime
+	existingSchedule.EndTime = input.EndTime
+	existingSchedule.SubjectId = input.SubjectId
+	existingSchedule.GradeId = input.GradeId
+
+	err = s.repo.Update(existingSchedule)
+	if err != nil {
+		return err
+	}
+
+	return nil 
 }
