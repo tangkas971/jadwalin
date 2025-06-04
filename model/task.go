@@ -8,11 +8,11 @@ type Task struct {
 	Description string
 	Deadline time.Time
 
-	LecturerId int
-	Lecturer User  `gorm:"foreignKey:LecturerId;references:Id"`
+	SubjectId int
+	Subject Subject
 
-	ScheduleId int
-	Schedule Schedule  `gorm:"foreignKey:ScheduleId;references:Id"`
+	LecturerId int
+	Lecturer User 
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

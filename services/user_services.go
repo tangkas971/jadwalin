@@ -8,8 +8,8 @@ import (
 type UserService interface {
 	FindAll()([]dto.UserResponseDTO, error)
 	FindStudentByGradeAndProdi(grade_id int, prodi_id int)([]dto.StudentResponseDTO, error)
+	FindByRole(roleUser string)([]dto.UserResponseDTO, error) 
 	// FindById(id int)(dto.UserResponseDTO, error)
-	// FindByRole(roleUser string)([]dto.UserResponseDTO, error)
 	// Delete(roleUser string, id int) error
 	// CreateUser(input dto.RegisterUserRequest)(dto.UserResponseDTO, error)
 	// LoginUser(input dto.LoginUserRequest)(dto.LoginResponseDTO, error)
@@ -65,24 +65,24 @@ func (s *userService) FindStudentByGradeAndProdi(grade_id int, prodi_id int)([]d
 	return studendDTOs, nil 
 }
 
-// func (s *userService) FindByRole(roleUser string)([]dto.UserResponseDTO, error){
-// 	users, err := s.repo.FindByRole(roleUser)
-// 	if err != nil {
-// 		return []dto.UserResponseDTO{}, err
-// 	}
+func (s *userService) FindByRole(roleUser string)([]dto.UserResponseDTO, error){
+	users, err := s.repo.FindByRole(roleUser)
+	if err != nil {
+		return []dto.UserResponseDTO{}, err
+	}
 
-// 	var userDTOs []dto.UserResponseDTO
-// 	for _, user := range users{
-// 		userDTO := dto.UserResponseDTO{
-// 			Id: user.Id,
-// 			Name: user.Name,
-// 			NIM: user.NIM,
-// 			Email: user.Email,
-// 		}
-// 		userDTOs = append(userDTOs, userDTO)
-// 	}
-// 	return userDTOs, nil 
-// }
+	var userDTOs []dto.UserResponseDTO
+	for _, user := range users{
+		userDTO := dto.UserResponseDTO{
+			Id: user.Id,
+			Name: user.Name,
+			Email: user.Email,
+			Role: user.Role,
+		}
+		userDTOs = append(userDTOs, userDTO)
+	}
+	return userDTOs, nil 
+}
 
 // func (s *userService) FindById(id int)(dto.UserResponseDTO, error){
 // 	user, err := s.repo.FindById(id)

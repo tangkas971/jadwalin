@@ -1,7 +1,11 @@
 package controller
 
 import (
+	"jadwalin/dto"
 	"jadwalin/services"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TaskController struct {
@@ -14,23 +18,29 @@ func NewTaskController(taskService services.TaskService) *TaskController{
 	}
 }
 
-// func (c *TaskController) Create(ctx *gin.Context){
-// 	var task dto.CreateTaskRequest
-// 	err := ctx.ShouldBindJSON(&task)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"error" : err.Error(),
-// 		})
-// 		return 
-// 	}
+func (c *TaskController) Create(ctx *gin.Context){
+	idAny, _ := ctx.Get("userId")
+	userId := idAny.(uint)
+	var taskDTO dto.TaskRequestDTO
+	err := ctx.ShouldBindJSON(&taskDTO)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
 
-// 	taskDTO, err := c.taskService.Create(task)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, gin.H{
-// 			"error" : err.Error(),
-// 		})
-// 		return 
-// 	}
+	taskDTO.LecturerId = int(userId)
 
-// 	ctx.JSON(http.StatusCreated, taskDTO)
-// }
+	err = c.taskService.Create(taskDTO)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error" : err.Error(),
+		})
+		return 
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message" : "task successfully created",
+	})
+}
