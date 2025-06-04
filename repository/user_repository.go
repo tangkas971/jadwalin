@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindByRole(roleUser string)([]*model.User, error)
 	FindByNim(nim int)(*model.Student, error)
 	FindByNip(nip int)(*model.Lecturer, error)
+	FindStudentByGradeAndProdi(grade_id int, prodi_id int)([]*model.Student, error)
 	FindAll()([]*model.User, error)
 	Create(user *model.User) error
 	Update(user *model.User) error
@@ -91,6 +92,15 @@ func (r *userRepository) FindByRole(roleUser string)([]*model.User, error){
 	}
 
 	return users, nil 
+}
+
+func (r *userRepository) FindStudentByGradeAndProdi(grade_id int, prodi_id int)([]*model.Student, error){
+	var students []*model.Student
+	err := r.db.Where("prodi_id = ?", prodi_id).Where("grade_id = ?", grade_id).Find(&students).Error
+	if err != nil {
+		return nil, err
+	}
+	return students, nil 
 }
 
 func (r *userRepository) Create(user *model.User) error {

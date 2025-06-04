@@ -7,6 +7,7 @@ import (
 
 type UserService interface {
 	FindAll()([]dto.UserResponseDTO, error)
+	FindStudentByGradeAndProdi(grade_id int, prodi_id int)([]dto.StudentResponseDTO, error)
 	// FindById(id int)(dto.UserResponseDTO, error)
 	// FindByRole(roleUser string)([]dto.UserResponseDTO, error)
 	// Delete(roleUser string, id int) error
@@ -43,6 +44,25 @@ func (s *userService) FindAll()([]dto.UserResponseDTO, error){
 	}
 
 	return userDTOs, nil 
+}
+
+func (s *userService) FindStudentByGradeAndProdi(grade_id int, prodi_id int)([]dto.StudentResponseDTO, error){
+	students, err := s.repo.FindStudentByGradeAndProdi(grade_id, prodi_id)
+	if err != nil {
+		return []dto.StudentResponseDTO{}, err
+	}
+
+	var studendDTOs []dto.StudentResponseDTO
+	for _, student := range students {
+		studentDTO := dto.StudentResponseDTO{
+			UserId: student.UserId,
+			Nim: student.Nim,
+			GradeId: student.GradeId,
+			ProdiId: student.ProdiId,
+		}
+		studendDTOs = append(studendDTOs, studentDTO)
+	}
+	return studendDTOs, nil 
 }
 
 // func (s *userService) FindByRole(roleUser string)([]dto.UserResponseDTO, error){

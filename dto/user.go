@@ -17,3 +17,10 @@ type LecturerResponseDTO struct {
 	Name string `json:"name"`
 	Email string `json:"email"`
 }
+
+type StudentResponseDTO struct {
+	UserId int `json:"user_id"`
+	Nim int `json:"nim"`
+	GradeId int `json:"grade_id"`
+	ProdiId int `json:"prodi_id"`
+}

@@ -12,10 +12,11 @@ type JWTClaim struct {
 	UserId uint		`json:"id"`
 	Email  string 	`json:"email"`
 	Role   string	`json:"role"`
+	ProdiId int 	`json:"prodi_id"`
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(userId uint, email string, role string)(string, error){
+func GenerateJWT(userId uint, email string, role string, ProdiId *int)(string, error){
 	// batas waktu
 	expirationTime := time.Now().Add(24 * time.Hour)
 
@@ -23,12 +24,16 @@ func GenerateJWT(userId uint, email string, role string)(string, error){
 		UserId: userId,
 		Email: email,
 		Role: role,
+		ProdiId: 0,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// waktu token habis
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			// waktu token dibuat
 			IssuedAt: jwt.NewNumericDate(time.Now()),
 		},
+	}
+	if ProdiId != nil {
+		claims.ProdiId = *ProdiId
 	}
 	//membuat token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

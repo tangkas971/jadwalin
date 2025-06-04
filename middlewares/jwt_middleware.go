@@ -40,9 +40,10 @@ func AuthMiddleware(blacklistService services.BlacklistTokenService) gin.Handler
 			return
 		}
 
-		ctx.Set("userId", claims.UserId)
+		ctx.Set("userId", uint(claims.UserId))
 		ctx.Set("userEmail", claims.Email)
 		ctx.Set("userRole", claims.Role)
+		ctx.Set("userProdi", uint(claims.ProdiId))
 		ctx.Next()
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"jadwalin/model"
 	"jadwalin/repository"
 	"jadwalin/utils"
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,12 +21,14 @@ type AuthService interface {
 type authService struct {
 	authRepo repository.AuthRepository
 	userRepo repository.UserRepository
+	lecturerRepo repository.LecturerRepository
 }
 
-func NewAuthService(authRepo repository.AuthRepository, userRepo repository.UserRepository) AuthService {
+func NewAuthService(authRepo repository.AuthRepository, userRepo repository.UserRepository, lecturerRepo repository.LecturerRepository) AuthService {
 	return &authService{
 		authRepo: authRepo,
 		userRepo: userRepo,
+		lecturerRepo: lecturerRepo,
 	}
 }
 
@@ -74,7 +77,7 @@ func (s *authService) CreateStudent(userRole string, input dto.StudentRegisterRe
 	}
 
 	Student := model.Student{
-		UserID: User.Id,
+		UserId: User.Id,
 		Nim: input.NIM,
 		GradeId: input.GradeId,
 		ProdiId: input.ProdiId,
@@ -199,9 +202,24 @@ func (s *authService) Login(input dto.LoginUserRequest)(dto.LoginResponseDTO, er
 		return dto.LoginResponseDTO{}, fmt.Errorf("password salah")
 	}
 
-	token, err := utils.GenerateJWT(uint(user.Id), user.Email, user.Role)
-	if err != nil {
-		return dto.LoginResponseDTO{}, fmt.Errorf("gagal mengenerate token")
+	var token string
+	// mengambil data prodi lecturer
+	if user.Role == "dosen"{
+		lecturer, err := s.lecturerRepo.FindById(user.Id)
+		if err != nil {
+			return dto.LoginResponseDTO{}, err
+		}
+		log.Println("ini lecturer prodi", lecturer.ProdiId)
+
+		token, err = utils.GenerateJWT(uint(user.Id), user.Email, user.Role, &lecturer.ProdiId)
+		if err != nil {
+			return dto.LoginResponseDTO{}, fmt.Errorf("gagal mengenerate token")
+		}
+	}else{
+		token, err = utils.GenerateJWT(uint(user.Id), user.Email, user.Role, nil)
+		if err != nil {
+			return dto.LoginResponseDTO{}, fmt.Errorf("gagal mengenerate token")
+		}
 	}
 
 	return dto.LoginResponseDTO{

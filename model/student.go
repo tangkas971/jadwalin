@@ -1,7 +1,7 @@
 package model
 
 type Student struct {
-	UserID int
+	UserId int
 	Nim    int
 
 	GradeId int

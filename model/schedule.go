@@ -13,6 +13,13 @@ type Schedule struct {
 
     LecturerId int
     Lecturer   User `gorm:"foreignKey:LecturerId;references:Id"`
+
+    GradeId int
+    Grade Grade
+
+    ProdiId int
+    Prodi Prodi
+    
     CreatedAt  time.Time
     UpdatedAt  time.Time
 }

@@ -3,8 +3,8 @@ package controller
 import (
 	"jadwalin/dto"
 	"jadwalin/services"
+	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,20 +20,18 @@ func NewScheduleController(service services.ScheduleService) *ScheduleController
 }
 
 func (c *ScheduleController) Create(ctx *gin.Context){
-	roleAny, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "Unauthorized", 
-		})
-		return 
-	}
-
+	roleAny, _ := ctx.Get("userRole")
 	idAny,_ := ctx.Get("userId")
+	prodiAny,_ := ctx.Get("userProdi")
+	log.Println("ini prodiId ctrl", prodiAny)
+	log.Println("ini user Role", roleAny)
 
-	roleUser := roleAny.(string)
-	idUser := idAny.(uint)
+	userRole := roleAny.(string)
+	userId := idAny.(uint)
+	userProdi := prodiAny.(uint)
+	log.Println("ini user prodi uint", userProdi)
 
-	var scheduleDTO dto.CreateScheduleRequestDTO
+	var scheduleDTO dto.ScheduleRequestDTO
 
 	err := ctx.ShouldBindJSON(&scheduleDTO)
 	if err != nil {
@@ -44,7 +42,11 @@ func (c *ScheduleController) Create(ctx *gin.Context){
 		return 
 	}
 
-	schedule, err := c.service.Create(idUser, roleUser, scheduleDTO)
+	scheduleDTO.UserId = int(userId)
+	scheduleDTO.UserRole = userRole
+	scheduleDTO.ProdiId = int(userProdi)
+	
+	err = c.service.Create(scheduleDTO)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error" : err.Error(),
@@ -52,110 +54,8 @@ func (c *ScheduleController) Create(ctx *gin.Context){
 		return 
 	}
 
-	ctx.JSON(http.StatusCreated, schedule)
-
-}
-
-func (c *ScheduleController) FindAll(ctx *gin.Context){
-	schedules, err := c.service.FindAll()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error" : "gagal mendapatkan data schedules",
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, schedules)
-}
-
-func (c *ScheduleController) FindById(ctx *gin.Context){
-	idParam := ctx.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error" : "id tidak valid", 
-		})
-		return 
-	}
-	scheduleDTO, err := c.service.FindById(id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error" : err.Error(),
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, scheduleDTO)
-}
-
-func (c *ScheduleController) Update(ctx *gin.Context){
-	role, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "Unauthorized", 
-		})
-		return 
-	}
-
-	roleUser := role.(string)
-	var scheduleDTO dto.UpdateScheduleRequestDTO
-	idParam := ctx.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error" : "id tidak valid",
-		})
-		return 
-	}
-
-	err = ctx.ShouldBindJSON(&scheduleDTO)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error" : err.Error(),
-		})
-		return 
-	}
-
-	schedule, err := c.service.Update(roleUser, id, scheduleDTO)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error" : err.Error(),
-		})
-		return 
-	}
-
-	ctx.JSON(http.StatusCreated, schedule)
-}
-
-func (c *ScheduleController) Delete(ctx *gin.Context){
-	role, exists := ctx.Get("userRole")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error" : "Unauthorized", 
-		})
-		return 
-	}
-
-	roleUser := role.(string)
-
-	idParam := ctx.Param("id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error" : "id tidak valid",
-		})
-		return 
-	}
-
-	err = c.service.Delete(roleUser, id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error" : err.Error(),
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message" : "berhasil menghapus schedule",
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message" : "schedules successfully created",
 	})
+
 }
