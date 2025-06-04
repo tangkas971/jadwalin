@@ -13,3 +13,4 @@ func NewUserController(service services.UserService) *UserController {
 		service: service,
 	}
 }
+	
