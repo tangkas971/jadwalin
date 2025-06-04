@@ -10,6 +10,9 @@ import (
 
 type SubjectService interface {
 	Create(userRole string, input dto.SubjectRequestDTO) error
+	GetAll()([]dto.SubjectResponseDTO, error)
+	Delete(id int) error
+	Update(id int, input dto.SubjectRequestDTO) error
 }
 
 type subjectService struct {
@@ -51,4 +54,56 @@ func (s *subjectService) Create(userRole string, input dto.SubjectRequestDTO) er
 	}
 
 	return nil 
+}
+
+func (s *subjectService) GetAll()([]dto.SubjectResponseDTO, error){
+	subjects, err := s.subjectRepo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	var subjectDTOs []dto.SubjectResponseDTO
+	for _, subject := range subjects{
+		subjectDTO := dto.SubjectResponseDTO{
+			Id: subject.Id,
+			Code: subject.Code,
+			Name: subject.Name,
+			ProdiId: subject.ProdiId,
+			Prodi: dto.ProdiResponseDTO{
+				Name: subject.Prodi.Name,
+			},
+			CreateAt: subject.CreatedAt,
+			UpdatedAt: subject.UpdatedAt,
+		}
+		subjectDTOs = append(subjectDTOs, subjectDTO)
+	}
+
+	return subjectDTOs, nil 
+}
+
+func (s *subjectService) Delete(id int) error{
+	err := s.subjectRepo.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil 
+}
+
+func (s *subjectService) Update(id int, input dto.SubjectRequestDTO) error{
+	existingSubject, err := s.subjectRepo.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	existingSubject.Code = input.Code
+	existingSubject.Name = input.Name
+	existingSubject.ProdiId = input.ProdiId
+
+	err = s.subjectRepo.Update(existingSubject)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -12,5 +12,8 @@ func SubjectRoute(router *gin.Engine, subjectController *controller.SubjectContr
 	v1 := router.Group("v1")
 	auth := v1.Group("/", middlewares.AuthMiddleware(blacklistService))
 
-	auth.POST("/subject", subjectController.Create)
+	auth.POST("/subjects", subjectController.Create)
+	auth.GET("/subjects", subjectController.GetAll)
+	auth.DELETE("/subjects/:id", subjectController.Delete)
+	auth.PUT("/subjects/:id", subjectController.Update)
 }
